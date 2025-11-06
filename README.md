@@ -20,7 +20,8 @@
 <p> -->
 
 ## 🔥 Updates!!
-* Nov 7, 2025: 🤗 Paper release
+* Nov 7, 2025: 🔥 Paper, Training and Inference Codes && Checkpoints && Demo released!
+* Sep 18, 2025: 🎉 InfinityStar is accepted as NeurIPS 2025 Oral.
 
 ## 🕹️ Try and Play with Infinity!
 
