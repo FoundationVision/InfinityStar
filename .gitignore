@@ -19,7 +19,6 @@ stable-diffusion-v1-4/
 *.pth.tar
 *.ckpt
 *.log
-*.txt
 *.ipynb
 toscli
 *.hydra
