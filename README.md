@@ -38,8 +38,49 @@ We provide a [demo website](http://opensource.bytedance.com/discord/invite) for 
 
 
 ## 📖 Introduction
-We introduce InfinityStar, a unified spacetime autoregressive framework for high-resolution image and dynamic video synthesis. Building on the recent success of autoregressive modeling in both vision and language, our purely discrete approach jointly captures spatial and temporal dependencies within a single architecture. This unified design naturally supports a variety of generation tasks such as text-to-image, text-to-video, image-to-video, and long-duration video synthesis via straightforward temporal autoregression. Through extensive experiments, InfinityStar scores 83.74 on VBench, outperforming all autoregressive models by large margins, even surpassing diffusion competitors like HunyuanVideo. Without extra optimizations, our model generates a 5s, 720p video approximately 10x faster than leading diffusion-based methods. To our knowledge, InfinityStar is the first discrete autoregressive video generator capable of producing industrial-level 720p videos. We release all code and models to foster further research in efficient, high-quality video generation.
+- We introduce **InfinityStar**, a unified spacetime autoregressive framework for high-resolution image and dynamic video synthesis. Building on the recent success of autoregressive modeling in both vision and language, our purely discrete approach jointly captures spatial and temporal dependencies within a single architecture. 
 
+- This unified design naturally supports a variety of generation tasks such as **text-to-image**, **text-to-video**, **image-to-video**, and **long-duration video synthesis** via straightforward temporal autoregression. 
+
+- Through extensive experiments, **InfinityStar** scores 83.74 on VBench, **outperforming all autoregressive models by large margins, even surpassing diffusion competitors like HunyuanVideo**, **approximately 10x faster than leading diffusion-based methods**. 
+
+- To our knowledge, **InfinityStar is the first discrete autoregressive video generator capable of producing industrial-level 720p videos**.
+
+
+### 🔥 Unified modeling for image, video generation and long-duration video synthesis 📈:
+
+<div align="left">
+    <img src="assets/framework.png" alt="" style="width: 100%;" />
+</div>
+
+## Benchmark
+
+### Achieve sota performance on image generation benchmark:
+
+<div align="left">
+    <img src="assets/Infinitystar_image_gen_benchmark.png" alt="Image Generation Evaluation" style="width: 100%;" />
+</div>
+
+### Achieve sota performance on video generation benchmark:
+
+<div align="left">
+    <img src="assets/Infinitystar_videogen_benchmark.png" alt="" style="width: 100%;" />
+</div>
+
+### Surpassing diffusion competitors like HunyuanVideo*:
+
+<div align="left">
+    <img src="assets/Infinitystar_videogen_humaneval.png" alt="" style="width: 100%;" />
+</div>
+
+
+## Visualization
+
+### Text to image examples
+
+<div align="left">
+    <img src="assets/supp_show_images.png" alt="Text to Image Examples" style="width: 100%;" />
+</div>
 
 
 
@@ -92,11 +133,14 @@ If our work assists your research, feel free to give us a star ⭐ or cite us us
 ```
 
 ```
-@article{InfinityStar,
-  title={InfinityStar: Unified Spacetime AutoRegressive Modeling for Visual Generation},
-  author={Jinlai Liu and jian Han and Bin Yan and Hui Wu and Fengda Zhu and Xing Wang and Yi Jiang and Bingyue Peng and Zehuan Yuan},
-  journal={Advances in neural information processing systems},
-  year={2025},
+@misc{InfinityStar,
+      title={InfinityStar: Unified Spacetime AutoRegressive Modeling for Visual Generation}, 
+      author={Jinlai Liu and Jian Han and Bin Yan and Hui Wu and Fengda Zhu and Xing Wang and Yi Jiang and Bingyue Peng and Zehuan Yuan},
+      year={2025},
+      eprint={2511.04675},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2511.04675}, 
 }
 ```
 
