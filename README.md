@@ -69,6 +69,29 @@ We provide a comprehensive workflow for training and finetuning our model, cover
 If our work assists your research, feel free to give us a star ⭐ or cite us using:
 
 ```
+@Article{VAR,
+      title={Visual Autoregressive Modeling: Scalable Image Generation via Next-Scale Prediction}, 
+      author={Keyu Tian and Yi Jiang and Zehuan Yuan and Bingyue Peng and Liwei Wang},
+      year={2024},
+      eprint={2404.02905},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
+}
+```
+
+```
+@misc{Infinity,
+    title={Infinity: Scaling Bitwise AutoRegressive Modeling for High-Resolution Image Synthesis}, 
+    author={Jian Han and Jinlai Liu and Yi Jiang and Bin Yan and Yuqi Zhang and Zehuan Yuan and Bingyue Peng and Xiaobing Liu},
+    year={2024},
+    eprint={2412.04431},
+    archivePrefix={arXiv},
+    primaryClass={cs.CV},
+    url={https://arxiv.org/abs/2412.04431}, 
+}
+```
+
+```
 @article{InfinityStar,
   title={InfinityStar: Unified Spacetime AutoRegressive Modeling for Visual Generation},
   author={Jinlai Liu and jian Han and Bin Yan and Hui Wu and Fengda Zhu and Xing Wang and Yi Jiang and Bingyue Peng and Zehuan Yuan},
