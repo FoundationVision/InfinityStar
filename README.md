@@ -83,6 +83,21 @@ We introduce InfinityStar, a unified spacetime autoregressive framework for high
     <img src="assets/supp_show_images.png" alt="Text to Image Examples" style="width: 100%;" />
 </div>
 
+### Image to video examples
+
+<div align="left">
+    <img src="assets/i2v_examples.png" alt="Image to Video Examples" style="width: 100%;" />
+</div>
+
+### Video extrapolation examples
+
+<div align="left">
+    <img src="assets/v2v_examples.png" alt="Video Extrapolation Examples" style="width: 100%;" />
+</div>
+
+## Video Demos
+More video demos are coming soon!
+
 
 
 ## Installation
