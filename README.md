@@ -20,7 +20,7 @@
 <p> -->
 
 ## 🔥 Updates!!
-* Nov 7, 2025: 🔥 Paper, Training and Inference Codes && Checkpoints && Demo Websites released!
+* Nov 7, 2025: 🔥 Paper, Training and Inference Codes && Checkpoints && Demo Website released!
 * Sep 18, 2025: 🎉 InfinityStar is accepted as NeurIPS 2025 Oral.
 
 ## 🕹️ Try and Play with Infinity!
@@ -36,15 +36,16 @@ We provide a [demo website](http://opensource.bytedance.com/discord/invite) for 
   - [ ] InfinityStar-Interact Checkpoints & Inference Code
 
 
+## ✨ Overview
+We introduce InfinityStar, a unified spacetime autoregressive framework for high-resolution image and dynamic video synthesis.
 
-## 📖 Introduction
-- We introduce **InfinityStar**, a unified spacetime autoregressive framework for high-resolution image and dynamic video synthesis. Building on the recent success of autoregressive modeling in both vision and language, our purely discrete approach jointly captures spatial and temporal dependencies within a single architecture. 
-
-- This unified design naturally supports a variety of generation tasks such as **text-to-image**, **text-to-video**, **image-to-video**, and **long-duration video synthesis** via straightforward temporal autoregression. 
-
-- Through extensive experiments, **InfinityStar** scores 83.74 on VBench, **outperforming all autoregressive models by large margins, even surpassing diffusion competitors like HunyuanVideo**, **approximately 10x faster than leading diffusion-based methods**. 
-
-- To our knowledge, **InfinityStar is the first discrete autoregressive video generator capable of producing industrial-level 720p videos**.
+- 🧠 **Unified Spacetime Model**: A purely discrete, autoregressive approach that jointly captures spatial and temporal dependencies within a single, elegant architecture.
+  
+- 🎬 **Versatile Generation**: This unified design naturally supports a variety of generation tasks such as **text-to-image**, **text-to-video**, **image-to-video**, and **long-duration video synthesis** via straightforward temporal autoregression.
+  
+- 🏆 **Leading Performance & Speed**: Through extensive experiments, InfinityStar scores **83.74** on VBench, outperforming all autoregressive models by large margins, even surpassing diffusion competitors like HunyuanVideo, approximately **10x** faster than leading diffusion-based methods.
+  
+- 📖 **Pioneering High-Resolution Discrete Generation**: To our knowledge, InfinityStar is the first discrete autoregressive video generator capable of producing industrial-level 720p videos, setting a new standard for quality in its class.
 
 
 ### 🔥 Unified modeling for image, video generation and long-duration video synthesis 📈:
