@@ -50,7 +50,7 @@ We introduce InfinityStar, a unified spacetime autoregressive framework for high
 ## 🎬 Video Demos
 #### General Aesthetics
 <div align="left">
-<video src="https://github.com/user-attachments/assets/5cb07470-174f-47e3-b89d-c77895c5940d" width="100%" controls autoplay loop></video>
+<video src="https://github.com/user-attachments/assets/14e2b18b-9234-42ce-bdab-670faeef4b2a" width="100%" controls autoplay loop></video>
 </div>
 
 ####  Anime & 3D Animation
