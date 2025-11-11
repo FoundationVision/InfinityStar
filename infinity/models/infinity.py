@@ -319,12 +319,9 @@ class Infinity(nn.Module):
                         logits = logits.reshape(x_BLC.shape[0], mul_pt_ph_pw, -1, self.other_args.num_of_label_value)
                         logits = logits.permute(0,3,1,2) # [1, mul_pt_ph_pw, d, num_of_label_value] -> [1, num_of_label_value, mul_pt_ph_pw, d]
                         # gt[global_scale_ptr]: [1, mul_pt_ph_pw, d]
-                        if self.other_args.num_of_label_value > 1:
-                            loss_this_scale = F.cross_entropy(logits, gt[global_scale_ptr], reduction='none').mean(-1)[0] # [mul_pt_ph_pw]
-                            acc_this_scale = (logits.argmax(1) == gt[global_scale_ptr]).float().mean(-1)[0] # [mul_pt_ph_pw]
-                        elif self.other_args.num_of_label_value == 1:
-                            loss_this_scale = torch.nn.functional.mse_loss(logits.squeeze(1), gt[global_scale_ptr], reduction='none').mean(-1)[0] # [mul_pt_ph_pw]
-                            acc_this_scale = loss_this_scale
+                        loss_this_scale = F.cross_entropy(logits, gt[global_scale_ptr], reduction='none').mean(-1)[0] # [mul_pt_ph_pw]
+                        acc_this_scale = (logits.argmax(1) == gt[global_scale_ptr]).float().mean(-1)[0] # [mul_pt_ph_pw]
+
                         loss_list.append(loss_this_scale)
                         acc_list.append(acc_this_scale)
                         global_scale_ptr += 1
@@ -802,7 +799,6 @@ class Infinity(nn.Module):
             cfg = cfg_list[si]
             infer_repeat_times = min(repeat_times, args.max_repeat_times)
             for repeat_idx in range(infer_repeat_times):
-                print(f'real scale ind is : {cum_scales+repeat_idx}')
                 frame_ss, frame_ee = context_info[si]['frame_ss'], context_info[si]['frame_ee']
                 rope_cache = get_visual_rope_embeds(self.rope2d_freqs_grid, scale_schedule[-1], scale_schedule[si], list(range(frame_ss, frame_ee)), cum_scales+repeat_idx, device)
                 last_repetition_step = (repeat_idx == (infer_repeat_times-1))

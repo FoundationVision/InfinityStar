@@ -115,7 +115,7 @@ We introduce InfinityStar, a unified spacetime autoregressive framework for high
   - [x] InfinityStar Inference Code
   - [x] InfinityStar Models Checkpoints
   - [x] InfinityStar-Interact Inference Code
-  - [ ] InfinityStar-Interact Checkpoints
+  - [x] InfinityStar-Interact Checkpoints
 
 
 ## Installation
