@@ -63,11 +63,6 @@ We introduce InfinityStar, a unified spacetime autoregressive framework for high
 <video src="https://github.com/user-attachments/assets/adab669b-d38f-4607-9a52-32d8d0bf0e53" width="100%" controls autoplay loop></video>
 </div>
 
-#### Long Interactive Video Synthesis
-<div align="left">
-<video src="https://github.com/user-attachments/assets/2e2ff380-5775-4700-a6ba-93aaef831c1b" width="100%" controls autoplay loop></video>
-</div>
-
 ## Benchmark
 
 ### Achieve sota performance on image generation benchmark:
@@ -109,6 +104,10 @@ We introduce InfinityStar, a unified spacetime autoregressive framework for high
     <img src="assets/v2v_examples.png" alt="Video Extrapolation Examples" style="width: 100%;" />
 </div>
 
+#### Long Interactive Video Synthesis
+<div align="left">
+<video src="https://github.com/user-attachments/assets/2e2ff380-5775-4700-a6ba-93aaef831c1b" width="100%" controls autoplay loop></video>
+</div>
 
 
 ## 📑 Open-Source Plan
