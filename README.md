@@ -106,7 +106,14 @@ We introduce InfinityStar, a unified spacetime autoregressive framework for high
 
 #### Long Interactive Video Synthesis
 <div align="left">
-<video src="https://github.com/user-attachments/assets/2e2ff380-5775-4700-a6ba-93aaef831c1b" width="130%" controls autoplay loop></video>
+  <video 
+    src="https://github.com/user-attachments/assets/2e2ff380-5775-4700-a6ba-93aaef831c1b"
+    style="width:130%;"
+    controls
+    autoplay
+    loop
+    muted
+  ></video>
 </div>
 
 
