@@ -29,8 +29,8 @@ from transformers import AutoTokenizer, T5EncoderModel, T5TokenizerFast
 import torch.distributed as tdist
 
 import infinity.utils.dist as dist
-from infinity.dataset.build import build_t2i_dataset, build_joint_dataset
-from infinity.utils.save_and_load import CKPTSaver, omnistoreCheckpoint, auto_resume, omnistore_auto_resume, merge_ckpt
+from infinity.dataset.build import build_joint_dataset
+from infinity.utils.save_and_load import CKPTSaver, omnistoreCheckpoint, auto_resume, omnistore_auto_resume
 from infinity.models.ema import get_ema_model
 from infinity.utils import arg_util, misc, wandb_utils
 from infinity.trainer import get_trainer

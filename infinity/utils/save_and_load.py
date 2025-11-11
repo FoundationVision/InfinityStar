@@ -11,8 +11,6 @@ from typing import List, Optional, Tuple
 
 import torch
 from torch.distributed.fsdp import FullyShardedDataParallel as FSDP
-from omnistore import FSDPCheckpointer
-from bytedance.trainingmetrics import metrics_client
 
 import glob
 import shutil
@@ -183,21 +181,6 @@ def omnistore_auto_resume(args: arg_util.Args, pattern='ckpt*.pth'):
     return resume, info
 
 
-def _is_trace_training_duration():
-    if (
-        metrics_client is not None
-        and os.environ.get('ENABLE_TRAINING_DURATION_METRICS_COLLECTION', 'false') == 'true'
-        and os.environ.get('MERLIN_JOB_ID', None) is not None
-        and os.environ.get("ARNOLD_ROBUST_TRAINING", None) == '1'
-    ):
-        # collect metrics from any of the following executor
-        executor_list = ["executor-0-0", "executor-0-1", "executor-0-2",
-                         "executor-0", "executor-1", "executor-2"]
-        for ending in executor_list:
-            if os.environ.get("MY_POD_NAME", "").endswith(ending):
-                return True
-    return False
-
 class omnistoreCheckpoint(object):
     def __init__(self, eval_milestone: List[Tuple[float, float]]):
         self.time_stamp = torch.tensor([time.time() - 1e5, time.time()], device=dist.get_device())
@@ -205,10 +188,6 @@ class omnistoreCheckpoint(object):
         self.sp_best: subprocess.Popen = None
         self.sp_backup: subprocess.Popen = None
         self.acc_str, self.eval_milestone = '[no acc str]', eval_milestone
-        if _is_trace_training_duration():
-            self.ettr_reporter = metrics_client.TrainingMetricsClient()
-        else:
-            self.ettr_reporter = None
     
     def sav(
         self, args: arg_util.Args, global_it: int, next_ep: int, next_it: int, fsdp_object: FSDP, optimizer_object: torch.optim.Optimizer,
@@ -218,8 +197,6 @@ class omnistoreCheckpoint(object):
         if eval_milestone is not None: self.eval_milestone = eval_milestone
         
         stt = time.time()
-        if self.ettr_reporter is not None:
-            trace_id = self.ettr_reporter.start_trace(metrics_client.Stage.SAVE_CKPT)
         
         checkpoint_state = {
             # 'model': {
@@ -231,6 +208,7 @@ class omnistoreCheckpoint(object):
             'extra_state': {}
         }
 
+        from omnistore import FSDPCheckpointer
         print(f"{FSDPCheckpointer=}")
         
         FSDPCheckpointer.save(
@@ -267,10 +245,9 @@ class omnistoreCheckpoint(object):
         
         dist.barrier()
         del checkpoint_state
-        if self.ettr_reporter is not None:
-            self.ettr_reporter.stop_trace(trace_id)
     
     def load(self, ckpt_path, fsdp_object, optimizer_object):
+        from omnistore import FSDPCheckpointer
         checkpoint_state = {
             'model': fsdp_object,
             # 'optimizer': optimizer_object,
