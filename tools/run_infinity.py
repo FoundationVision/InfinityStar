@@ -26,7 +26,6 @@ from infinity.utils.load import load_visual_tokenizer
 from infinity.models.basic import *
 import PIL.Image as PImage
 from torchvision.transforms.functional import to_tensor
-from infinity.utils.save_and_load import merge_ckpt
 
 def extract_key_val(text):
     pattern = r'<(.+?):(.+?)>'
@@ -238,6 +237,7 @@ def load_transformer(vae, args):
             from transformers.modeling_utils import load_sharded_checkpoint
             load_sharded_checkpoint(infinity_test, model_path, strict=False)
         elif args.checkpoint_type == 'omnistore':
+            from infinity.utils.save_and_load import merge_ckpt
             if args.enable_model_cache and osp.exists(args.cache_dir):
                 local_model_dir = osp.abspath(osp.join(args.cache_dir, 'tmp', model_path.replace('/', '_')))
             else:
