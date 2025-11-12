@@ -74,9 +74,15 @@ if __name__ == '__main__':
     )
 
     checkpoints_dir='./'
-    args.model_path=os.path.join(checkpoints_dir, 'InfinityStarInteract_24K_iters')
+    args.model_path='[TBD]'
     args.vae_path=os.path.join(checkpoints_dir, 'infinitystar_videovae.pth')
     args.text_encoder_ckpt=os.path.join(checkpoints_dir, 'text_encoder/flan-t5-xl-official/')
+
+    args.vae_path='/mnt/bn/foundation-vision/hanjian.thu123/VideoVAE/video_vae_results/hj_vae_l2c16_l2c64_8_semantic_reg_after_semantics/slim_vae/model_step_7799.ckpt'
+    args.text_encoder_ckpt='/mnt/bn/foundation-vision/hanjian.thu123/data/flan-t5-xl-official'
+    # args.model_path='/mnt/bn/foundation-vision/hanjian.thu123/infinity/star/vgpt/checkpoints_vision/infinity_star_multiple_clips_sp8_with_pretrain_2e4_revised_caption2_040m_sp_size4_100w_data_second_clip_only7_longcat_video_ref_first_frame/global_step_24000'
+    # args.checkpoint_type='omnistore'
+    args.model_path='/tmp/weights/infinity_interact_24k'
     args.checkpoint_type='torch_shard'
     
 
@@ -130,6 +136,8 @@ if __name__ == '__main__':
     args.frames_inner_clip=20
     args.image_scale_repetition = '[3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 2, 1]'
     args.video_scale_repetition = args.image_scale_repetition
+    # args.taui, args.tauv = 0.4, 0.4
+    # args.use_cfg, args.use_apg, args.cfg, args.apg_norm_threshold = 0, 1, 30, 0.05
     args.taui, args.tauv = 0.5, 0.5
     args.use_cfg, args.use_apg, args.cfg, args.apg_norm_threshold = 1, 0, 3, 0.05
     args.tau = [args.taui] * len(json.loads(args.image_scale_repetition)) + [args.tauv] * len(json.loads(args.video_scale_repetition))
@@ -168,9 +176,15 @@ if __name__ == '__main__':
     dynamic_resolution_h_w, h_div_w_templates = get_dynamic_resolution_meta(args.dynamic_scale_schedule, args.video_frames)
     h_div_w_template_list = np.array(list(dynamic_resolution_h_w.keys()))
 
-    test_data_dir = 'data/interactive_toy_videos'
-    for dir_ind, story_id in enumerate(os.listdir(test_data_dir)):
-        story_dir = osp.join(test_data_dir, story_id)
+    import json
+    with open('/mnt/bn/foundation-vision/hanjian.thu123/infinity/star/vgpt/data/long_cat_video_interactive_data_train_test_splits/train.json', 'r') as f:
+        story_dirs = json.load(f)
+
+    test_data_dir = 'data/interactive_toy_data'
+
+    for dir_ind, story_dir in enumerate(story_dirs):
+        story_id = osp.basename(story_dir)
+        os.system(f'cp -r {story_dir} {test_data_dir}')
         prompt_path = osp.join(story_dir, 'prompt.txt')
         with open(prompt_path, 'r') as f:
             prompts = f.readlines()
@@ -200,12 +214,12 @@ if __name__ == '__main__':
                 recons_video = vae.decode(former_clip_features, slice=True)
                 recons_video = tensor2images(recons_video)
                 ref_video_path = osp.join(save_dir, f"{ind:04d}.mp4")
-                save_video(recons_video[0], fps=args.fps, save_filepath=ref_video_path)
+                images2video(recons_video[0], fps=args.fps, save_filepath=ref_video_path)
                 if first_frame_features is None:
                     first_frame_features = former_clip_features[:,:,0:1]
                 raw_video = np.array([cv2.resize(img, (tgt_w, tgt_h)) for img in raw_video])
                 ref_video_path = osp.join(save_dir, f"{ind:04d}_gt.mp4")
-                save_video(raw_video, fps=args.fps, save_filepath=ref_video_path)
+                images2video(raw_video, fps=args.fps, save_filepath=ref_video_path)
                 shutil.copyfile(prompt_path, osp.join(save_dir, f"prompt.txt"))
             else:
                 mode = 'second_v_clip'
@@ -236,4 +250,4 @@ if __name__ == '__main__':
                 )
                 video = video.cpu().numpy()
                 ref_video_path = osp.join(save_dir, f"{ind:04d}.mp4")
-                save_video(video, fps=args.fps, save_filepath=ref_video_path)
+                images2video(video, fps=args.fps, save_filepath=ref_video_path)

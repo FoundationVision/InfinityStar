@@ -8,6 +8,8 @@ import time
 import hashlib
 import shutil
 import re
+import json
+from typing import Dict
 
 import cv2
 import numpy as np
@@ -20,12 +22,31 @@ from torch.cuda.amp import autocast
 from timm.models import create_model
 import imageio
 
-
 from infinity.models.infinity import Infinity
 from infinity.utils.load import load_visual_tokenizer
 from infinity.models.basic import *
 import PIL.Image as PImage
 from torchvision.transforms.functional import to_tensor
+from huggingface_hub import split_torch_state_dict_into_shards
+from safetensors.torch import save_file as safe_save_file
+
+
+def split_state_dict(state_dict: Dict[str, torch.Tensor], save_directory: str, max_shard_size='8GB'):
+    state_dict_split = split_torch_state_dict_into_shards(state_dict, max_shard_size=max_shard_size)
+    for filename, tensors in state_dict_split.filename_to_tensors.items():
+        shard = {tensor: state_dict[tensor] for tensor in tensors}
+        safe_save_file(
+            shard,
+            os.path.join(save_directory, filename),
+            metadata={"format": "pt"},
+        )
+    if state_dict_split.is_sharded:
+        index = {
+            "metadata": state_dict_split.metadata,
+            "weight_map": state_dict_split.tensor_to_filename,
+        }
+        with open(os.path.join(save_directory, "model.safetensors.index.json"), "w") as f:
+            f.write(json.dumps(index, indent=2))
 
 def extract_key_val(text):
     pattern = r'<(.+?):(.+?)>'
@@ -235,7 +256,7 @@ def load_transformer(vae, args):
             print(infinity_test.load_state_dict(state_dict))
         elif args.checkpoint_type == 'torch_shard':
             from transformers.modeling_utils import load_sharded_checkpoint
-            load_sharded_checkpoint(infinity_test, model_path, strict=False)
+            print(load_sharded_checkpoint(infinity_test, model_path, strict=False))
         elif args.checkpoint_type == 'omnistore':
             from infinity.utils.save_and_load import merge_ckpt
             if args.enable_model_cache and osp.exists(args.cache_dir):
@@ -245,10 +266,15 @@ def load_transformer(vae, args):
             print(f'load checkpoint from {local_model_dir}')
             state_dict = merge_ckpt(local_model_dir, osp.join(local_model_dir, 'ouput'), save=False, fsdp_save_flatten_model=args.fsdp_save_flatten_model)
             print(infinity_test.load_state_dict(state_dict))
+            import pdb; pdb.set_trace()
+            # # split_state_dict
+            # save_directory = '/tmp/weights/infinity_interact_24k'
+            # os.makedirs(save_directory, exist_ok=True)
+            # split_state_dict(state_dict, save_directory)
         infinity_test.rng = torch.Generator(device=device)
     return infinity_test
 
-def images2video(ndarray_image_list, fps=24, save_filepath='tmp.mp4'):
+def save_video(ndarray_image_list, fps=24, save_filepath='tmp.mp4'):
     if len(ndarray_image_list) == 1:
         save_filepath = save_filepath.replace('.mp4', '.jpg')
         cv2.imwrite(save_filepath, ndarray_image_list[0])
