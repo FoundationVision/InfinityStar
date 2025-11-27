@@ -79,16 +79,9 @@ def build_everything_from_args(args: arg_util.Args, saver):
     # auto resume from broken experiment
     global_it = 0
     if args.checkpoint_type == 'torch':
-        auto_resume_info, start_ep, start_it, acc_str, eval_milestone, trainer_state, args_state = auto_resume(args, 'ar-ckpt*.pth')
-        print(f'global bs={args.glb_batch_size}, local bs={args.batch_size}')
-        print(f'initial args:\n{str(args)}')
-        args.dump_log()
-        if start_ep == args.epoch:
-            args.dump_log()
-            print(f'[vgpt] AR finished ({acc_str}), skipping ...\n\n')
-            return None
+        auto_resume_info, start_ep, global_it, acc_str, _, trainer_state, _ = auto_resume(args, 'global_step_*')        
         if trainer_state is not None and len(trainer_state):
-            trainer.load_state_dict(trainer_state, strict=False, skip_vae=True) # don't load vae again
+            trainer.load_state_dict(trainer_state, strict=False, skip_vae=True) 
     elif args.checkpoint_type == 'omnistore':
         resume_path, info = omnistore_auto_resume(args, 'global_step_*')
         if not resume_path and args.rush_omnistore_resume:

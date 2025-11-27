@@ -81,7 +81,7 @@ train.py \
 --model=infinity_qwen8b \
 --project_name=infinity \
 --exp_name=${exp_name} \
---checkpoint_type='omnistore' \
+--checkpoint_type='torch' \
 --enable_checkpointing=full-block \
 --video_fps=${video_fps} \
 --video_frames=${video_frames} \

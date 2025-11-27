@@ -253,7 +253,10 @@ def load_transformer(vae, args):
         print(f'============== [Load Infinity weights] ==============')    
         if args.checkpoint_type == 'torch':
             state_dict = torch.load(model_path, map_location=device)
-            print(infinity_test.load_state_dict(state_dict))
+            if 'trainer' in state_dict:
+                print(infinity_test.load_state_dict(state_dict['trainer']['gpt_fsdp']))
+            else:
+                print(infinity_test.load_state_dict(state_dict))
         elif args.checkpoint_type == 'torch_shard':
             from transformers.modeling_utils import load_sharded_checkpoint
             print(load_sharded_checkpoint(infinity_test, model_path, strict=False))
@@ -266,11 +269,6 @@ def load_transformer(vae, args):
             print(f'load checkpoint from {local_model_dir}')
             state_dict = merge_ckpt(local_model_dir, osp.join(local_model_dir, 'ouput'), save=False, fsdp_save_flatten_model=args.fsdp_save_flatten_model)
             print(infinity_test.load_state_dict(state_dict))
-            import pdb; pdb.set_trace()
-            # # split_state_dict
-            # save_directory = '/tmp/weights/infinity_interact_24k'
-            # os.makedirs(save_directory, exist_ok=True)
-            # split_state_dict(state_dict, save_directory)
         infinity_test.rng = torch.Generator(device=device)
     return infinity_test
 

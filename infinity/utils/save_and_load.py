@@ -53,76 +53,35 @@ class CKPTSaver(object):
         acc_str: Optional[str] = None, eval_milestone: Optional[List[Tuple[float, float]]] = None,
         also_save_to: str = None, best_save_to: str = None,
     ):
-        self.time_stamp[1] = time.time()
-        dist.broadcast(self.time_stamp, src_rank=0)
-        last_save_time, cur_time = self.time_stamp.cpu().tolist()
-        
-        auto_save = cur_time - last_save_time > 20 * 60
-        need_save = also_save_to is not None or best_save_to is not None or next_ep == args.epoch or auto_save
-        if not need_save:
-            return
-        
-        if acc_str is not None: self.acc_str = acc_str
-        if eval_milestone is not None: self.eval_milestone = eval_milestone
-        
-        fname = f'ar-ckpt-giter{g_it//1000:03d}K-ep{next_ep}-iter{next_it}-last.pth' if args.gpt_training else f'ckpt-last.pth'
-        local_out_ckpt = os.path.join(args.local_out_path, fname)
-        
-        # NOTE: all rank should call this state_dict(), not master only!
+        fname = f'global_step_{g_it}.pth'
+        local_out_ckpt = os.path.join(args.bed, fname)
         trainer_state = trainer.state_dict()
-        
+        stt = time.time()
         if self.is_master:
-            stt = time.time()
             torch.save({
                 'args':         args.state_dict(),
-                'gpt_training': args.gpt_training,
-                'arch':         args.model if args.gpt_training else args.vv,
+                'arch':         args.model,
                 'epoch':        next_ep,
                 'iter':         next_it,
                 'trainer':      trainer_state,
                 'acc_str':      self.acc_str,
                 'g_it':         g_it,
-                'milestones':   self.eval_milestone,
             }, local_out_ckpt)
-            
-            print(f'[CKPTSaver][rank00] start: {also_save_to=} {best_save_to=} {(next_ep == args.epoch)=} {auto_save=}  |  see {local_out_ckpt}', flush=True)
-            print(f'[CKPTSaver][rank00] dbg: {args.bed=}', flush=True)                
-            if auto_save:
-                if self.sp_backup is not None:
-                    self.sp_backup.wait(timeout=300); self.sp_backup.kill(); self.sp_backup.communicate()
-                self.time_stamp[0] = time.time()
-
-                def auto_sync(source_filename, target_filename):
-                    cmd = f'cp -r {source_filename} {target_filename}'
-                    if source_filename.endswith('.pth') and (osp.abspath(source_filename) != osp.abspath(target_filename)):
-                        cmd += f' && rm -rf {source_filename}'
-                    self.sp_backup = subprocess.Popen(cmd, shell=True, bufsize=-1)
-                    print(f'[CKPTSaver] auto_save cmd: {cmd}', flush=True)
-
-                local_files = glob.glob(f"{args.local_out_path}/*")
-                for filename in local_files:
-                    basename = os.path.basename(filename)
-                    target_filename = f'{args.bed}/{basename}'
-                    if basename.endswith('.pth'):
-                        if not os.path.isfile(target_filename):
-                            auto_sync(filename, target_filename)
-                    else:
-                        auto_sync(filename, target_filename)                    
-            cost = time.time() - stt
-            print(f'[CKPTSaver][rank00] cost: {cost:.2f}s', flush=True)
+        cost = time.time() - stt
+        print(f'Checkpoint save cost: {cost:.2f}s', flush=True)
+        print(f'Checkpoint save to: {local_out_ckpt}', flush=True)
         
         del trainer_state
-        time.sleep(3), gc.collect(), torch.cuda.empty_cache(), time.sleep(3)
+        gc.collect(), 
+        torch.cuda.empty_cache()
         dist.barrier()
         
 
-def auto_resume(args: arg_util.Args, pattern='ckpt*.pth') -> Tuple[List[str], int, int, str, List[Tuple[float, float]], dict, dict]:
+def auto_resume(args: arg_util.Args, pattern='*.pth') -> Tuple[List[str], int, int, str, List[Tuple[float, float]], dict, dict]:
     info = []
     resume = ''
     if args.auto_resume:
-        for dd in (args.local_out_path, args.bed):
-            all_ckpt = glob_with_epoch_iter(os.path.join(dd, pattern))
-            if len(all_ckpt): break
+        all_ckpt = glob_with_global_step(os.path.join(args.bed, pattern))
         if len(all_ckpt) == 0:
             info.append(f'[auto_resume] no ckpt found @ {pattern}')
             info.append(f'[auto_resume quit]')
@@ -137,29 +96,13 @@ def auto_resume(args: arg_util.Args, pattern='ckpt*.pth') -> Tuple[List[str], in
         return info, 0, 0, '[no acc str]', [], {}, {}
 
     print(f'auto resume from {resume}')
-
-    try:
-        import os.path as osp
-        tgt_file = os.path.join(args.local_out_path, osp.basename(tgt_file))
-        os.makedirs(osp.dirname(tgt_file), exist_ok=True)
-        print(f'[load model] copy {resume} to {tgt_file}')
-        shutil.copyfile(resume, tgt_file)
-        ckpt = torch.load(tgt_file, map_location='cpu')
-    except Exception as e:
-        info.append(f'[auto_resume] failed, {e} @ {resume}')
-        if len(all_ckpt) < 2:
-            return info, 0, 0, '[no acc str]', [], {}, {}
-        try: # another chance to load from bytenas
-            ckpt = torch.load(all_ckpt[1], map_location='cpu')
-        except Exception as e:
-            info.append(f'[auto_resume] failed, {e} @ {all_ckpt[1]}')
-            return info, 0, 0, '[no acc str]', [], {}, {}
+    ckpt = torch.load(resume, map_location='cpu')
     
     dist.barrier()
-    ep, it, g_it = ckpt['epoch'], ckpt['iter'], ckpt.get('g_it', 0)
+    ep, it, g_it = ckpt['epoch'], ckpt['iter'], ckpt['g_it']
     eval_milestone = ckpt.get('milestones', [])
     info.append(f'[auto_resume success] resume from ep{ep}, it{it},    eval_milestone: {eval_milestone}')
-    return info, ep, it, ckpt.get('acc_str', '[no acc str]'), eval_milestone, ckpt['trainer'], ckpt['args']
+    return info, ep, g_it, ckpt.get('acc_str', '[no acc str]'), eval_milestone, ckpt['trainer'], ckpt['args']
 
 def omnistore_auto_resume(args: arg_util.Args, pattern='ckpt*.pth'):
     info = []
