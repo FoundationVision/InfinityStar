@@ -22,6 +22,7 @@
 
 ---
 ## 🔥 Updates!!
+* April 16, 2026: 🔥 We Release [GRN](https://github.com/MGenAI/GRN), a next-generation visual synthesis framework. Neither diffusion nor autoregressive — GRN is a third way. 🧠 Refines globally like an artist. ⚡ Generates adaptively by complexity. 🏆 New SOTA across image & video. The visual generation paradigm just got rewritten.
 * Nov 7, 2025: 🔥 Paper, Training and Inference Codes && Checkpoints && Demo Website released!
 * Sep 18, 2025: 🎉 InfinityStar is accepted as NeurIPS 2025 Oral.
 
